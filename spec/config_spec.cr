@@ -8,6 +8,77 @@ describe "Kemal::Shield" do
       end
     end
 
+    describe "#cross_origin_opener_policy" do
+      after_each do
+        Kemal::Shield.config.cross_origin_opener_policy = "same-origin"
+      end
+
+      it "sets the policy correctly" do
+        Kemal::Shield.config.cross_origin_opener_policy = "unsafe-none"
+        Kemal::Shield.config.cross_origin_opener_policy.should eq "unsafe-none"
+      end
+
+      it "raise an ArgumentError if invalid policy" do
+        expect_raises(ArgumentError) do
+          Kemal::Shield.config.cross_origin_opener_policy = "invalid-policy"
+        end
+      end
+    end
+
+    describe "#cross_origin_resource_policy" do
+      after_each do
+        Kemal::Shield.config.cross_origin_resource_policy = "same-origin"
+      end
+
+      it "sets the policy correctly" do
+        Kemal::Shield.config.cross_origin_resource_policy = "same-site"
+        Kemal::Shield.config.cross_origin_resource_policy.should eq "same-site"
+      end
+
+      it "raise an ArgumentError if invalid policy" do
+        expect_raises(ArgumentError) do
+          Kemal::Shield.config.cross_origin_resource_policy = "invalid-policy"
+        end
+      end
+    end
+
+    describe "#referrer_policy" do
+      after_each do
+        Kemal::Shield.config.referrer_policy = ["no-referrer"]
+      end
+
+      it "should set the value correctly" do
+        tests = [
+          {tokens: ["origin", "strict-origin", "same-origin"], expected: "origin,strict-origin,same-origin"},
+          {tokens: ["no-referrer"], expected: "no-referrer"},
+          {tokens: ["no-referrer", "no-referrer-when-downgrade"], expected: "no-referrer,no-referrer-when-downgrade"}
+        ]
+
+        tests.each do |test|
+          Kemal::Shield.config.referrer_policy = test[:tokens]
+          Kemal::Shield.config.referrer_policy.should eq test[:expected]
+        end
+      end
+
+      it "raises an ArgumentError if tokens are empty" do
+        expect_raises(ArgumentError) do
+          Kemal::Shield.config.referrer_policy = [] of String
+        end
+      end
+
+      it "raises an ArgumentError if tokens contains invalid tokens" do
+        expect_raises(ArgumentError) do
+          Kemal::Shield.config.referrer_policy = ["invalid-token"]
+        end
+      end
+
+      it "raises an ArgumentError if tokens contains dublicates" do
+        expect_raises(ArgumentError) do
+          Kemal::Shield.config.referrer_policy = ["no-referrer", "no-referrer"]
+        end
+      end
+    end
+
     describe "#x_frame_options" do
       after_each do
         Kemal::Shield.config.x_frame_options = "SAMEORIGIN"

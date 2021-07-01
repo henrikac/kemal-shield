@@ -7,6 +7,133 @@ describe "Kemal::Shield" do
     end
   end
 
+  describe "::CrossOriginEmbedderPolicy" do
+    it "is set to require-corp" do
+      add_handler Kemal::Shield::CrossOriginEmbedderPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Embedder-Policy").should be_true
+      client_response.headers["Cross-Origin-Embedder-Policy"].should eq "require-corp"
+    end
+  end
+
+  describe "::CrossOriginOpenerPolicy" do
+    it "is set to same-origin" do
+      add_handler Kemal::Shield::CrossOriginOpenerPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Opener-Policy").should be_true
+      client_response.headers["Cross-Origin-Opener-Policy"].should eq "same-origin"
+    end
+  end
+
+  describe "::CrossOriginResourcePolicy" do
+    it "is set to same-origin" do
+      add_handler Kemal::Shield::CrossOriginResourcePolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Resource-Policy").should be_true
+      client_response.headers["Cross-Origin-Resource-Policy"].should eq "same-origin"
+    end
+  end
+
+  describe "::ExpectCT" do
+    it "has max-age=0 by default" do
+      add_handler Kemal::Shield::ExpectCT.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Expect-CT").should be_true
+      client_response.headers["Expect-CT"].should eq "max-age=0"
+    end
+
+    it "can turn on enforce" do
+      add_handler Kemal::Shield::ExpectCT.new(enforce: true)
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Expect-CT").should be_true
+      client_response.headers["Expect-CT"].should eq "max-age=0, enforce"
+    end
+
+    it "can add report_uri" do
+      add_handler Kemal::Shield::ExpectCT.new(report_uri: "https://example.com/report")
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Expect-CT").should be_true
+      client_response.headers["Expect-CT"].should eq "max-age=0, report-uri=https://example.com/report"
+    end
+
+    it "raises an ArgumentError if max_age if less than 0" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::ExpectCT.new(-1)
+      end
+    end
+  end
+
+  describe "::OriginAgentCluster" do
+    it "is on by default" do
+      add_handler Kemal::Shield::OriginAgentCluster.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Origin-Agent-Cluster").should be_true
+      client_response.headers["Origin-Agent-Cluster"].should eq "?1"
+    end
+  end
+
+  describe "::ReferrerPolicy" do
+    it "is set to no-referrer by default" do
+      add_handler Kemal::Shield::ReferrerPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Referrer-Policy").should be_true
+      client_response.headers["Referrer-Policy"].should eq "no-referrer"
+    end
+  end
+  
+  describe "::StrictTransportSecurity" do
+    it "has max-age and includeSubDomains set by default" do
+      add_handler Kemal::Shield::StrictTransportSecurity.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Strict-Transport-Security").should be_true
+      client_response.headers["Strict-Transport-Security"].should eq "max-age=15552000; includeSubDomains"
+    end
+
+    it "can turn off includeSubDomains" do
+      add_handler Kemal::Shield::StrictTransportSecurity.new(include_sub_domains: false)
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Strict-Transport-Security").should be_true
+      client_response.headers["Strict-Transport-Security"].should eq "max-age=15552000"
+    end
+
+    it "can turn on preload" do
+      add_handler Kemal::Shield::StrictTransportSecurity.new(preload: true)
+      request = HTTP::Request.new("GET", "/")
+
+      expected = "max-age=15552000; includeSubDomains; preload"
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Strict-Transport-Security").should be_true
+      client_response.headers["Strict-Transport-Security"].should eq expected
+    end
+
+    it "raises an ArgumentError if max_age is less than 0" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::StrictTransportSecurity.new(-1)
+      end
+    end
+  end
+
   describe "::XContentTypeOptions" do
     it "is set to nosniff by default" do
       add_handler Kemal::Shield::XContentTypeOptions.new

@@ -1,0 +1,9 @@
+name: kemal-shield
+version: 0.1.0
+
+authors:
+  - Henrik Christensen <sensen1695@hotmail.com>
+
+crystal: 1.0.0
+
+license: MIT

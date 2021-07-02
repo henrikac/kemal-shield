@@ -147,7 +147,7 @@ describe "Kemal::Shield" do
 
   describe "::XDNSPrefetchControl" do
     after_each do
-      Kemal::Shield.config.x_dns_prefetch_control_on = false
+      Kemal::Shield.config.x_dns_prefetch_control = false
     end
 
     it "is set to off by default" do
@@ -160,7 +160,7 @@ describe "Kemal::Shield" do
     end
 
     it "can be set to on" do
-      Kemal::Shield.config.x_dns_prefetch_control_on = true
+      Kemal::Shield.config.x_dns_prefetch_control = true
       add_handler Kemal::Shield::XDNSPrefetchControl.new
       request = HTTP::Request.new("GET", "/")
 
@@ -237,5 +237,4 @@ describe "Kemal::Shield" do
       client_response.headers["X-XSS-Protection"].should eq "0"
     end
   end
-
 end

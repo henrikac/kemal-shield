@@ -2,30 +2,30 @@ module Kemal::Shield
   class Config
     INSTANCE = self.new
 
-    @cross_origin_embedder_policy_on : Bool
+    @cross_origin_embedder_policy : Bool
     @cross_origin_opener_policy : String
     @cross_origin_resource_policy : String
     @expect_ct : Bool
     @hide_powered_by : Bool
     @no_sniff : Bool
-    @origin_agent_cluster_on : Bool
+    @origin_agent_cluster : Bool
     @referrer_policy : String
-    @strict_transport_security_on : Bool
-    @x_dns_prefetch_control_on : Bool
-    @x_download_options_on : Bool
+    @strict_transport_security : Bool
+    @x_dns_prefetch_control : Bool
+    @x_download_options : Bool
     @x_frame_options : String
     @x_permitted_cross_domain_policies : String
-    @x_xss_protection_off : Bool
+    @x_xss_protection : Bool
 
-    property cross_origin_embedder_policy_on
+    property cross_origin_embedder_policy
     property expect_ct
     property hide_powered_by
     property no_sniff
-    property origin_agent_cluster_on
-    property strict_transport_security_on
-    property x_dns_prefetch_control_on
-    property x_download_options_on
-    property x_xss_protection_off
+    property origin_agent_cluster
+    property strict_transport_security
+    property x_dns_prefetch_control
+    property x_download_options
+    property x_xss_protection
 
     getter cross_origin_opener_policy
     getter cross_origin_resource_policy
@@ -34,20 +34,20 @@ module Kemal::Shield
     getter x_permitted_cross_domain_policies
 
     def initialize
-      @cross_origin_embedder_policy_on = true
+      @cross_origin_embedder_policy = true
       @cross_origin_opener_policy = "same-origin"
       @cross_origin_resource_policy = "same-origin"
       @expect_ct = true
       @hide_powered_by = true
       @no_sniff = true
-      @origin_agent_cluster_on = true
+      @origin_agent_cluster = true
       @referrer_policy = "no-referrer"
-      @strict_transport_security_on = true
-      @x_dns_prefetch_control_on = false
-      @x_download_options_on = true
+      @strict_transport_security = true
+      @x_dns_prefetch_control = false
+      @x_download_options = true
       @x_frame_options = "SAMEORIGIN"
       @x_permitted_cross_domain_policies = "none"
-      @x_xss_protection_off = true
+      @x_xss_protection = false
     end
 
     def cross_origin_opener_policy=(policy : String)

@@ -7,6 +7,7 @@ module Kemal::Shield
 
   class All
     def initialize
+      add_handler ContentSecurityPolicy.new
       add_handler CrossOriginEmbedderPolicy.new
       add_handler CrossOriginOpenerPolicy.new
       add_handler CrossOriginResourcePolicy.new

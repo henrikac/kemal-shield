@@ -2,6 +2,10 @@ module Kemal::Shield
   class Config
     INSTANCE = self.new
 
+    @csp_on : Bool
+    @csp_defaults : Bool
+    @csp_directives : Hash(String, Array(String))
+    @csp_report_only : Bool
     @cross_origin_embedder_policy : Bool
     @cross_origin_opener_policy : String
     @cross_origin_resource_policy : String
@@ -17,6 +21,10 @@ module Kemal::Shield
     @x_permitted_cross_domain_policies : String
     @x_xss_protection : Bool
 
+    property csp_on
+    property csp_defaults
+    property csp_directives
+    property csp_report_only
     property cross_origin_embedder_policy
     property expect_ct
     property hide_powered_by
@@ -34,6 +42,10 @@ module Kemal::Shield
     getter x_permitted_cross_domain_policies
 
     def initialize
+      @csp_on = true
+      @csp_defaults = true
+      @csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
+      @csp_report_only = false
       @cross_origin_embedder_policy = true
       @cross_origin_opener_policy = "same-origin"
       @cross_origin_resource_policy = "same-origin"

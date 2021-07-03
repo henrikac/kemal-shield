@@ -7,6 +7,124 @@ describe "Kemal::Shield" do
     end
   end
 
+  describe "::ContentSecurityPolicy" do
+    after_each do
+      Kemal::Shield.config.csp_defaults = true
+      Kemal::Shield.config.csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
+      Kemal::Shield.config.csp_report_only = false
+    end
+
+    it "has default policy" do
+      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expected_policy = "default-src 'self';base-uri 'self';block-all-mixed-content;\
+      font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;\
+      object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';\
+      upgrade-insecure-requests;"
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Content-Security-Policy").should be_true
+      client_response.headers["Content-Security-Policy"].should eq expected_policy
+    end
+
+    it "adds default directives if not in custom directives and use_defaults is true" do
+      Kemal::Shield.config.csp_directives = {"default-src" => ["'self'"]}
+
+      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expected_policy = "default-src 'self';base-uri 'self';block-all-mixed-content;\
+      font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;\
+      object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';\
+      upgrade-insecure-requests;"
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Content-Security-Policy").should be_true
+      client_response.headers["Content-Security-Policy"].should eq expected_policy
+    end
+
+    it "does not add default directives if use_defaults is false" do
+      Kemal::Shield.config.csp_defaults = false
+      Kemal::Shield.config.csp_directives = {"default-src" => ["'self'"]}
+
+      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expected_policy = "default-src 'self';"
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Content-Security-Policy").should be_true
+      client_response.headers["Content-Security-Policy"].should eq expected_policy
+    end
+
+    it "raises an ArgumentError if directive name is an empty string" do
+      Kemal::Shield.config.csp_directives = {"" => ["'self'"]}
+
+      handler = Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expect_raises(ArgumentError) do
+        process_request(request, handler)
+      end
+    end
+
+    it "raises an ArgumentError if directive name matches /[^a-zA-Z0-9-]/" do
+      Kemal::Shield.config.csp_directives = {"default_src" => ["'self'"]}
+
+      handler = Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expect_raises(ArgumentError) do
+        process_request(request, handler)
+      end
+    end
+
+    it "raises an ArgumentError if dublicate directives" do
+      Kemal::Shield.config.csp_directives = {
+        "default-src" => ["'self'"],
+        "DEFAULT-SRC" => ["'self'"]
+      }
+
+      handler = Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+
+      expect_raises(ArgumentError) do
+        process_request(request, handler)
+      end
+    end
+
+    it "raises an ArgumentError if default-src has no value" do
+      Kemal::Shield.config.csp_directives = {"default-src" => [] of String}
+
+      handler = Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      expect_raises(ArgumentError) do
+        process_request(request, handler)
+      end
+    end
+
+    it "raises an ArgumentError if a value contains either ; or ," do
+      test_directives = [
+        {"default-src" => ["'self';"]},
+        {"default-src" => ["'self',"]}
+      ]
+
+      test_directives.each do |test_directive|
+        Kemal::Shield.config.csp_directives = test_directive
+
+        handler = Kemal::Shield::ContentSecurityPolicy.new
+        request = HTTP::Request.new("GET", "/")
+
+        expect_raises(ArgumentError) do
+          process_request(request, handler)
+        end
+      end
+    end
+  end
+
   describe "::CrossOriginEmbedderPolicy" do
     it "is set to require-corp" do
       add_handler Kemal::Shield::CrossOriginEmbedderPolicy.new

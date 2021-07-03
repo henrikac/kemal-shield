@@ -1,17 +1,21 @@
 require "spec"
 require "../src/kemal-shield"
 
-# credit to: https://github.com/kemalcr/kemal/blob/master/spec/spec_helper.cr#L58
-
-def call_request_on_app(request)
+def process_request(request, handler)
   io = IO::Memory.new
   response = HTTP::Server::Response.new(io)
   context = HTTP::Server::Context.new(request, response)
-  main_handler = build_main_handler
-  main_handler.call(context)
+  handler.call(context)
   response.close
   io.rewind
-  HTTP::Client::Response.from_io(io, decompress: false)
+  io
+end
+
+# credit to: https://github.com/kemalcr/kemal/blob/master/spec/spec_helper.cr#L58
+
+def call_request_on_app(request)
+  io_with_context = process_request(request, build_main_handler)
+  HTTP::Client::Response.from_io(io_with_context, decompress: false)
 end
 
 def build_main_handler

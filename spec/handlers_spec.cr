@@ -159,6 +159,13 @@ describe "Kemal::Shield" do
   end
 
   describe "::ExpectCT" do
+    after_each do
+      Kemal::Shield.config.expect_ct = true
+      Kemal::Shield.config.expect_ct_max_age = 0
+      Kemal::Shield.config.expect_ct_enforce = false
+      Kemal::Shield.config.expect_ct_report_uri = ""
+    end
+
     it "has max-age=0 by default" do
       add_handler Kemal::Shield::ExpectCT.new
       request = HTTP::Request.new("GET", "/")
@@ -169,7 +176,9 @@ describe "Kemal::Shield" do
     end
 
     it "can turn on enforce" do
-      add_handler Kemal::Shield::ExpectCT.new(enforce: true)
+      Kemal::Shield.config.expect_ct_enforce = true
+
+      add_handler Kemal::Shield::ExpectCT.new
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -178,7 +187,9 @@ describe "Kemal::Shield" do
     end
 
     it "can add report_uri" do
-      add_handler Kemal::Shield::ExpectCT.new(report_uri: "https://example.com/report")
+      Kemal::Shield.config.expect_ct_report_uri = "https://example.com/report"
+
+      add_handler Kemal::Shield::ExpectCT.new
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -188,7 +199,8 @@ describe "Kemal::Shield" do
 
     it "raises an ArgumentError if max_age if less than 0" do
       expect_raises(ArgumentError) do
-        Kemal::Shield::ExpectCT.new(-1)
+        Kemal::Shield.config.expect_ct_max_age = -1
+        Kemal::Shield::ExpectCT.new
       end
     end
   end
@@ -216,6 +228,13 @@ describe "Kemal::Shield" do
   end
   
   describe "::StrictTransportSecurity" do
+    after_each do
+      Kemal::Shield.config.strict_transport_security = true
+      Kemal::Shield.config.strict_transport_security_max_age = Kemal::Shield::StrictTransportSecurity::DEFAULT_MAX_AGE
+      Kemal::Shield.config.strict_transport_security_include_sub = true
+      Kemal::Shield.config.strict_transport_security_preload = false
+    end
+
     it "has max-age and includeSubDomains set by default" do
       add_handler Kemal::Shield::StrictTransportSecurity.new
       request = HTTP::Request.new("GET", "/")
@@ -226,7 +245,9 @@ describe "Kemal::Shield" do
     end
 
     it "can turn off includeSubDomains" do
-      add_handler Kemal::Shield::StrictTransportSecurity.new(include_sub_domains: false)
+      Kemal::Shield.config.strict_transport_security_include_sub = false
+
+      add_handler Kemal::Shield::StrictTransportSecurity.new
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -235,7 +256,9 @@ describe "Kemal::Shield" do
     end
 
     it "can turn on preload" do
-      add_handler Kemal::Shield::StrictTransportSecurity.new(preload: true)
+      Kemal::Shield.config.strict_transport_security_preload = true
+
+      add_handler Kemal::Shield::StrictTransportSecurity.new
       request = HTTP::Request.new("GET", "/")
 
       expected = "max-age=15552000; includeSubDomains; preload"
@@ -247,7 +270,9 @@ describe "Kemal::Shield" do
 
     it "raises an ArgumentError if max_age is less than 0" do
       expect_raises(ArgumentError) do
-        Kemal::Shield::StrictTransportSecurity.new(-1)
+        Kemal::Shield.config.strict_transport_security_max_age = -1
+
+        Kemal::Shield::StrictTransportSecurity.new
       end
     end
   end

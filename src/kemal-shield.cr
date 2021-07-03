@@ -1,7 +1,45 @@
 require "kemal"
 require "./**"
 
-# TODO: Write ocumentation for `Kemal::Shield`
+# `Kemal::Shield` is a module that contains a collection of Kemal handlers.
+# These handlers sets/unsets different HTTP response headers adding an extra
+# layer of protection.
+#
+# ```
+# Kemal::Shield::All.new # => Adds all the handlers
+# ```
+#
+# It is also possible to add just the handlers that you are interested in.
+#
+# ```
+# add_handler Kemal::Shield::XPoweredBy.new # => Removes the X-Powered-By header
+# add_handler Kemal::Shield::XXSSProtection.new # => Sets X-XSS-Protection to "0"
+# ```
+#
+# The different headers can be configured in the same way as Kemal:
+#
+# ```
+# Kemal::Shield.config do |config|
+#   config.csp_on = true
+#   config.csp_defaults = true
+#   config.csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
+#   config.csp_report_only = false
+#   config.cross_origin_embedder_policy = true
+#   config.cross_origin_opener_policy = "same-origin"
+#   config.cross_origin_resource_policy = "same-origin"
+#   config.expect_ct = true
+#   config.hide_powered_by = true
+#   config.no_sniff = true
+#   config.origin_agent_cluster = true
+#   config.referrer_policy = "no-referrer"
+#   config.strict_transport_security = true
+#   config.x_dns_prefetch_control = false
+#   config.x_download_options = true
+#   config.x_frame_options = "SAMEORIGIN"
+#   config.x_permitted_cross_domain_policies = "none"
+#   config.x_xss_protection = false
+# end
+# ```
 module Kemal::Shield
   VERSION = "0.1.0"
 

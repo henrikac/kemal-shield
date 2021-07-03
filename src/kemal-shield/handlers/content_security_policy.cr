@@ -1,5 +1,31 @@
 require "kemal"
 
+# `Kemal::Shield::ContentSecurityPolicy` sets the Content-Security-Policy (CSP) header.
+# This header can help mitigate different kinds of client side attacks, e.g. cross-site-scripting (XSS).
+#
+# The following directives are set unless custom directives are supplied:
+# ```bash
+# default-src 'self';
+# base-uri 'self';
+# block-all-mixed-content;
+# font-src 'self' https: data:;
+# frame-ancestors 'self';
+# img-src 'self' data:;
+# object-src 'none';
+# script-src 'self';
+# script-src-attr 'none';
+# style-src 'self' https: 'unsafe-inline';
+# upgrade-insecure-requests;
+# ```
+#
+# This handler has following default configurations set:
+#
+# ```
+# Kemal::Shield.config.csp_on = true # => Toggles the CSP header on/off
+# Kemal::Shield.config.csp_defaults = true # => Adds default directives unless directive has been overridden
+# Kemal::Shield.config.csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
+# Kemal::Shield.config.csp_report_only = false # => Sets Content-Security-Policy-Report-Only header instead
+# ```
 class Kemal::Shield::ContentSecurityPolicy < Kemal::Handler
   DEFAULT_DIRECTIVES = {
     "default-src" => ["'self'"],
@@ -68,8 +94,6 @@ class Kemal::Shield::ContentSecurityPolicy < Kemal::Handler
     result = Hash(String, Array(String)).new
 
     @directives.each do |name, values|
-      pp @directives
-      puts "name: #{name}"
       if name.empty? || /[^a-zA-Z0-9-]/.match(name)
         raise ArgumentError.new("Content-Security-Policy received an invalid directive name #{name}")
       end

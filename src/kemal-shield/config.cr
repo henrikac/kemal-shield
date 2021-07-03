@@ -10,11 +10,17 @@ module Kemal::Shield
     @cross_origin_opener_policy : String
     @cross_origin_resource_policy : String
     @expect_ct : Bool
+    @expect_ct_max_age : Int32
+    @expect_ct_enforce : Bool
+    @expect_ct_report_uri : String
     @hide_powered_by : Bool
     @no_sniff : Bool
     @origin_agent_cluster : Bool
     @referrer_policy : String
     @strict_transport_security : Bool
+    @strict_transport_security_max_age : Int32
+    @strict_transport_security_include_sub : Bool
+    @strict_transport_security_preload : Bool
     @x_dns_prefetch_control : Bool
     @x_download_options : Bool
     @x_frame_options : String
@@ -27,10 +33,16 @@ module Kemal::Shield
     property csp_report_only
     property cross_origin_embedder_policy
     property expect_ct
+    property expect_ct_max_age
+    property expect_ct_enforce
+    property expect_ct_report_uri
     property hide_powered_by
     property no_sniff
     property origin_agent_cluster
     property strict_transport_security
+    property strict_transport_security_max_age
+    property strict_transport_security_include_sub
+    property strict_transport_security_preload
     property x_dns_prefetch_control
     property x_download_options
     property x_xss_protection
@@ -50,11 +62,17 @@ module Kemal::Shield
       @cross_origin_opener_policy = "same-origin"
       @cross_origin_resource_policy = "same-origin"
       @expect_ct = true
+      @expect_ct_max_age = 0
+      @expect_ct_enforce = false
+      @expect_ct_report_uri = ""
       @hide_powered_by = true
       @no_sniff = true
       @origin_agent_cluster = true
       @referrer_policy = "no-referrer"
       @strict_transport_security = true
+      @strict_transport_security_max_age = Kemal::Shield::StrictTransportSecurity::DEFAULT_MAX_AGE
+      @strict_transport_security_include_sub = true
+      @strict_transport_security_preload = false
       @x_dns_prefetch_control = false
       @x_download_options = true
       @x_frame_options = "SAMEORIGIN"

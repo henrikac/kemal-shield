@@ -12,9 +12,16 @@ require "kemal"
 # ```
 # Kemal::Shield.config.x_frame_options
 # ```
+#
+# This handler can be turned off by setting
+# ```
+# Kemal::Shield.config.x_frame_options_on = false
+# ```
 class Kemal::Shield::XFrameOptions < Kemal::Handler
   def call(context)
-    context.response.headers["X-Frame-Options"] = Kemal::Shield.config.x_frame_options
+    if Kemal::Shield.config.x_frame_options_on
+      context.response.headers["X-Frame-Options"] = Kemal::Shield.config.x_frame_options
+    end
     call_next(context)
   end
 end

@@ -11,10 +11,17 @@ require "kemal"
 # ```
 # Kemal::Shield.config.x_dns_prefetch_control = true
 # ```
+#
+# This handler can be turned of by setting
+# ```
+# Kemal::Shield.config.x_dns_control_on = false
+# ```
 class Kemal::Shield::XDNSPrefetchControl < Kemal::Handler
   def call(context)
-    value = Kemal::Shield.config.x_dns_prefetch_control ? "on" : "off"
-    context.response.headers["X-DNS-Prefetch-Control"] = value
+    if Kemal::Shield.config.x_dns_prefetch_control_on
+      value = Kemal::Shield.config.x_dns_prefetch_control ? "on" : "off"
+      context.response.headers["X-DNS-Prefetch-Control"] = value
+    end
     call_next(context)
   end
 end

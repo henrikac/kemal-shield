@@ -10,7 +10,7 @@ require "kemal"
 # ```
 #
 # Valid options:
-# ```bash
+# ```
 # "no-referrer"
 # "no-referrer-when-downgrade"
 # "same-origin"

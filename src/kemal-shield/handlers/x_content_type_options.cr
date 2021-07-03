@@ -3,11 +3,9 @@ require "kemal"
 # `Kemal::Shield::XContentTypeOptions` is a handler that sets the
 # X-Content-Type-Options HTTP header.
 #
-# The default value is "nosniff".
-#
 # This handler can be turned off by setting
 # ```
-# Kemal::Shield.config.x_content_type_options = false
+# Kemal::Shield.config.no_sniff = false
 # ```
 class Kemal::Shield::XContentTypeOptions < Kemal::Handler
   def call(context)

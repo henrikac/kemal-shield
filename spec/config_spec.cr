@@ -8,36 +8,36 @@ describe "Kemal::Shield" do
       end
     end
 
-    describe "#cross_origin_opener_policy" do
+    describe "#coop" do
       after_each do
-        Kemal::Shield.config.cross_origin_opener_policy = "same-origin"
+        Kemal::Shield.config.coop = "same-origin"
       end
 
       it "sets the policy correctly" do
-        Kemal::Shield.config.cross_origin_opener_policy = "unsafe-none"
-        Kemal::Shield.config.cross_origin_opener_policy.should eq "unsafe-none"
+        Kemal::Shield.config.coop = "unsafe-none"
+        Kemal::Shield.config.coop.should eq "unsafe-none"
       end
 
       it "raise an ArgumentError if invalid policy" do
         expect_raises(ArgumentError) do
-          Kemal::Shield.config.cross_origin_opener_policy = "invalid-policy"
+          Kemal::Shield.config.coop = "invalid-policy"
         end
       end
     end
 
-    describe "#cross_origin_resource_policy" do
+    describe "#corp" do
       after_each do
-        Kemal::Shield.config.cross_origin_resource_policy = "same-origin"
+        Kemal::Shield.config.corp = "same-origin"
       end
 
       it "sets the policy correctly" do
-        Kemal::Shield.config.cross_origin_resource_policy = "same-site"
-        Kemal::Shield.config.cross_origin_resource_policy.should eq "same-site"
+        Kemal::Shield.config.corp = "same-site"
+        Kemal::Shield.config.corp.should eq "same-site"
       end
 
       it "raise an ArgumentError if invalid policy" do
         expect_raises(ArgumentError) do
-          Kemal::Shield.config.cross_origin_resource_policy = "invalid-policy"
+          Kemal::Shield.config.corp = "invalid-policy"
         end
       end
     end

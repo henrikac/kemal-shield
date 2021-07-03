@@ -4,7 +4,7 @@ require "kemal"
 # This header can help mitigate different kinds of client side attacks, e.g. cross-site-scripting (XSS).
 #
 # The following directives are set unless custom directives are supplied:
-# ```bash
+# ```
 # default-src 'self';
 # base-uri 'self';
 # block-all-mixed-content;

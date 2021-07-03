@@ -9,7 +9,7 @@ require "kemal"
 # This handler sets the X-Permitted-Cross-Domain-Policies header to "none" by default.
 #
 # Valid options for this header:
-# ```bash
+# ```
 # "none"
 # "master-only"
 # "by-content-type"
@@ -21,10 +21,17 @@ require "kemal"
 # ```
 # Kemal::Shield.config.x_permitted_cross_domain_policies
 # ```
+#
+# This handler can be turned off by setting
+# ```
+# Kemal::Shield.config.x_permitted_cross_domain_policies_on = false
+# ```
 class Kemal::Shield::XPermittedCrossDomainPolicies < Kemal::Handler
   def call(context)
-    policies = Kemal::Shield.config.x_permitted_cross_domain_policies
-    context.response.headers["X-Permitted-Cross-Domain-Policies"] = policies
+    if Kemal::Shield.config.x_permitted_cross_domain_policies_on
+      policies = Kemal::Shield.config.x_permitted_cross_domain_policies
+      context.response.headers["X-Permitted-Cross-Domain-Policies"] = policies
+    end
     call_next(context)
   end
 end

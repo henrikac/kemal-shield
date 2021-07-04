@@ -28,8 +28,6 @@ require "./**"
 # end
 # ```
 module Kemal::Shield
-  VERSION = "0.1.0"
-
   class All
     def initialize
       add_handler ContentSecurityPolicy.new

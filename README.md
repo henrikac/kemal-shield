@@ -65,9 +65,9 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | csp_report_only | Set Content-Security-Policy-Report-Only header | `false` |
 | coep_on | Set Cross-Origin-Embedder-Policy header | `true` |
 | coop_on | Set Cross-Origin-Opener-Policy header | `true` |
-| coop | Cross-Origin-Opener-Policy policy | `same-origin` |
+| coop | Cross-Origin-Opener-Policy policy | `"same-origin"` |
 | corp_on | Set Cross-Origin-Resource-Policy header | `true` |
-| corp | Cross-Origin-Resource-Policy policy | `same-origin` |
+| corp | Cross-Origin-Resource-Policy policy | `"same-origin"` |
 | expect_ct | Set Expect-CT header | `true` |
 | expect_ct_max_age | Seconds the user agent should regard the host of the received message as a known Expect-CT host | `0` |
 | expect_ct_enforce | Whether the user agent should enforce compliance with the Certificate Transparency policy | `false` |
@@ -76,7 +76,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | no_sniff | Set X-Content-Type-Options header  | `true` |
 | oac | Set Origin-Agent-Cluster header | `true` |
 | referrer_on | Set Referrer-Policy header | `true` |
-| referrer_policy | The Referrer-Policy policy | `no-referrer` |
+| referrer_policy | The Referrer-Policy policy | `"no-referrer"` |
 | sts_on | Set Strict-Transport-Security | `true` |
 | sts_max_age | Seconds that the browser should remember that a site is only to be accessed using HTTPS | `15_552_000` |
 | sts_include_sub | Add rule to subdomains | `true` |
@@ -85,7 +85,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | x_dns_prefetch_control | Enable DNS prefetching | `false` |
 | x_download_options | Set X-Download-Options header | `true` |
 | x_frame_options_on | Set X-Frame-Options | `true` |
-| x_frame_options | X-Frame-Options directive | `SAMEORIGIN` |
+| x_frame_options | X-Frame-Options directive | `"SAMEORIGIN"` |
 | x_permitted_cross_domain_policies_on | Set X-Permitted-Cross-Domain-Policies header | `true` |
 | x_permitted_cross_domain_policies | X-Permitted-Cross-Domain-Policies directive | `none` |
 | x_xss_protection | Enable X-XSS-Protection header | `false` |

@@ -90,8 +90,9 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | x_permitted_cross_domain_policies | X-Permitted-Cross-Domain-Policies directive | `none` |
 | x_xss_protection | Enable X-XSS-Protection header | `false` |
 
+
 `ContentSecurityPolicy::DEFAULT_DIRECTIVES`:
-```bash
+```
 default-src 'self';
 base-uri 'self';
 block-all-mixed-content;

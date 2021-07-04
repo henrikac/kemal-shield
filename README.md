@@ -61,7 +61,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 |---|---|---|
 | csp_on | Set Content-Security-Policy header | `true` |
 | csp_defaults | Add CSP default directives | `true` |
-| csp_directives | CSP directives | `ContentSecurityPolicy::DEFAULT_DIRECTIVES` |
+| csp_directives | CSP directives | `DEFAULT_DIRECTIVES` |
 | csp_report_only | Set Content-Security-Policy-Report-Only header | `false` |
 | coep_on | Set Cross-Origin-Embedder-Policy header | `true` |
 | coop_on | Set Cross-Origin-Opener-Policy header | `true` |
@@ -89,6 +89,22 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | x_permitted_cross_domain_policies_on | Set X-Permitted-Cross-Domain-Policies header | `true` |
 | x_permitted_cross_domain_policies | X-Permitted-Cross-Domain-Policies directive | `none` |
 | x_xss_protection | Enable X-XSS-Protection header | `false` |
+
+`ContentSecurityPolicy::DEFAULT_DIRECTIVES`:
+```bash
+default-src 'self';
+base-uri 'self';
+block-all-mixed-content;
+font-src 'self' https: data:;
+frame-ancestors 'self';
+img-src 'self' data:;
+object-src 'none';
+script-src 'self';
+script-src-attr 'none';
+style-src 'self' https: 'unsafe-inline';
+upgrade-insecure-requests;
+```
+
 
 #### Handlers
 + `ContentSecurityPolicy`

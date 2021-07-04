@@ -53,6 +53,9 @@ module Kemal::Shield
     # Whether to set the Origin-Agent-Cluster header.
     @oac : Bool
 
+    # Whether to set the Referrer-Policy header.
+    @referrer_on : Bool
+
     # The Referrer-Policy.
     @referrer_policy : String
 
@@ -106,6 +109,7 @@ module Kemal::Shield
     property hide_powered_by
     property no_sniff
     property oac
+    property referrer_on
     property sts_on
     property sts_max_age
     property sts_include_sub
@@ -149,6 +153,7 @@ module Kemal::Shield
       @hide_powered_by = true
       @no_sniff = true
       @oac = true
+      @referrer_on = true
       @referrer_policy = "no-referrer"
       @sts_on = true
       @sts_max_age = Kemal::Shield::StrictTransportSecurity::DEFAULT_MAX_AGE

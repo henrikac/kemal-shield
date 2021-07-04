@@ -75,6 +75,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | hide_powered_by | Whether to remove the X-Powered-By header | `true` |
 | no_sniff | Set X-Content-Type-Options header  | `true` |
 | aoc | Set Origin-Agent-Cluster header | `true` |
+| referrer_on | Set Referrer-Policy header | `true` |
 | referrer_policy | The Referrer-Policy policy | `no-referrer` |
 | sts_on | Set Strict-Transport-Security | `true` |
 | sts_max_age | Seconds that the browser should remember that a site is only to be accessed using HTTPS | `15_552_000` |

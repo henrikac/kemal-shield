@@ -9,6 +9,7 @@ describe "Kemal::Shield" do
 
   describe "::ContentSecurityPolicy" do
     after_each do
+      Kemal::Shield.config.csp_on = true
       Kemal::Shield.config.csp_defaults = true
       Kemal::Shield.config.csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
       Kemal::Shield.config.csp_report_only = false
@@ -56,6 +57,16 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Content-Security-Policy").should be_true
       client_response.headers["Content-Security-Policy"].should eq expected_policy
+    end
+
+    it "will not set the Content-Security-Policy header is csp_on == false" do
+      Kemal::Shield.config.csp_on = false
+
+      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Content-Security-Policy").should be_false
     end
 
     it "raises an ArgumentError if directive name is an empty string" do
@@ -126,6 +137,10 @@ describe "Kemal::Shield" do
   end
 
   describe "::CrossOriginEmbedderPolicy" do
+    after_each do
+      Kemal::Shield.config.coep_on = true
+    end
+
     it "is set to require-corp" do
       add_handler Kemal::Shield::CrossOriginEmbedderPolicy.new
       request = HTTP::Request.new("GET", "/")
@@ -134,9 +149,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("Cross-Origin-Embedder-Policy").should be_true
       client_response.headers["Cross-Origin-Embedder-Policy"].should eq "require-corp"
     end
+
+    it "will not set the Cross-Origin-Embedder-Policy header if coep_on == false" do
+      Kemal::Shield.config.coep_on = false
+
+      add_handler Kemal::Shield::CrossOriginEmbedderPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Embedder-Policy").should be_false
+    end
   end
 
   describe "::CrossOriginOpenerPolicy" do
+    after_each do
+      Kemal::Shield.config.coop_on = true
+    end
+
     it "is set to same-origin" do
       add_handler Kemal::Shield::CrossOriginOpenerPolicy.new
       request = HTTP::Request.new("GET", "/")
@@ -145,9 +174,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("Cross-Origin-Opener-Policy").should be_true
       client_response.headers["Cross-Origin-Opener-Policy"].should eq "same-origin"
     end
+
+    it "will not set the Cross-Origin-Opener-Policy header if coop_on == false" do
+      Kemal::Shield.config.coop_on = false
+
+      add_handler Kemal::Shield::CrossOriginOpenerPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Opener-Policy").should be_false
+    end
   end
 
   describe "::CrossOriginResourcePolicy" do
+    after_each do
+      Kemal::Shield.config.corp_on = true
+    end
+
     it "is set to same-origin" do
       add_handler Kemal::Shield::CrossOriginResourcePolicy.new
       request = HTTP::Request.new("GET", "/")
@@ -155,6 +198,16 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Cross-Origin-Resource-Policy").should be_true
       client_response.headers["Cross-Origin-Resource-Policy"].should eq "same-origin"
+    end
+
+    it "will not set the Cross-Origin-Resource-Policy header if corp_on == false" do
+      Kemal::Shield.config.corp_on = false
+
+      add_handler Kemal::Shield::CrossOriginResourcePolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Cross-Origin-Resource-Policy").should be_false
     end
   end
 
@@ -197,6 +250,16 @@ describe "Kemal::Shield" do
       client_response.headers["Expect-CT"].should eq "max-age=0, report-uri=https://example.com/report"
     end
 
+    it "will not set the Expect-CT header if expect_ct == false" do
+      Kemal::Shield.config.expect_ct = false
+
+      add_handler Kemal::Shield::ExpectCT.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Expect-CT").should be_false
+    end
+
     it "raises an ArgumentError if max_age if less than 0" do
       expect_raises(ArgumentError) do
         Kemal::Shield.config.expect_ct_max_age = -1
@@ -206,6 +269,10 @@ describe "Kemal::Shield" do
   end
 
   describe "::OriginAgentCluster" do
+    after_each do
+      Kemal::Shield.config.oac = true
+    end
+
     it "is on by default" do
       add_handler Kemal::Shield::OriginAgentCluster.new
       request = HTTP::Request.new("GET", "/")
@@ -214,9 +281,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("Origin-Agent-Cluster").should be_true
       client_response.headers["Origin-Agent-Cluster"].should eq "?1"
     end
+
+    it "will not set the Origin-Agent-Cluster header if oac == false" do
+      Kemal::Shield.config.oac = false
+
+      add_handler Kemal::Shield::OriginAgentCluster.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Origin-Agent-Cluster").should be_false
+    end
   end
 
   describe "::ReferrerPolicy" do
+    after_each do
+      Kemal::Shield.config.referrer_on = true
+    end
+
     it "is set to no-referrer by default" do
       add_handler Kemal::Shield::ReferrerPolicy.new
       request = HTTP::Request.new("GET", "/")
@@ -224,6 +305,16 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Referrer-Policy").should be_true
       client_response.headers["Referrer-Policy"].should eq "no-referrer"
+    end
+
+    it "will not set the Referrer-Policy header if referrer_on == false" do
+      Kemal::Shield.config.referrer_on = false
+
+      add_handler Kemal::Shield::ReferrerPolicy.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Referrer-Policy").should be_false
     end
   end
   
@@ -268,6 +359,16 @@ describe "Kemal::Shield" do
       client_response.headers["Strict-Transport-Security"].should eq expected
     end
 
+    it "will not set the Strict-Transport-Security header if sts_on == false" do
+      Kemal::Shield.config.sts_on = false
+
+      add_handler Kemal::Shield::StrictTransportSecurity.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("Strict-Transport-Security").should be_false
+    end
+
     it "raises an ArgumentError if max_age is less than 0" do
       expect_raises(ArgumentError) do
         Kemal::Shield.config.sts_max_age = -1
@@ -278,6 +379,10 @@ describe "Kemal::Shield" do
   end
 
   describe "::XContentTypeOptions" do
+    after_each do
+      Kemal::Shield.config.no_sniff = true
+    end
+
     it "is set to nosniff by default" do
       add_handler Kemal::Shield::XContentTypeOptions.new
       request = HTTP::Request.new("GET", "/")
@@ -286,10 +391,21 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("X-Content-Type-Options").should be_true
       client_response.headers["X-Content-Type-Options"].should eq "nosniff"
     end
+
+    it "will not set the X-Content-Type-Options header if no_sniff == false" do
+      Kemal::Shield.config.no_sniff = false
+
+      add_handler Kemal::Shield::XContentTypeOptions.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("X-Content-Type-Options").should be_false
+    end
   end
 
   describe "::XDNSPrefetchControl" do
     after_each do
+      Kemal::Shield.config.x_dns_prefetch_control_on = true
       Kemal::Shield.config.x_dns_prefetch_control = false
     end
 
@@ -311,9 +427,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("X-DNS-Prefetch-Control").should be_true
       client_response.headers["X-DNS-Prefetch-Control"].should eq "on"
     end
+
+    it "will not set the X-DNS-Prefetch-Control header if x_dns_prefetch_control_on == false" do
+      Kemal::Shield.config.x_dns_prefetch_control_on = false
+
+      add_handler Kemal::Shield::XDNSPrefetchControl.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("X-DNS-Prefetch-Control").should be_false
+    end
   end
 
   describe "::XDownloadOptions" do
+    after_each do
+      Kemal::Shield.config.x_download_options = true
+    end
+
     it "is set to noopen" do
       add_handler Kemal::Shield::XDownloadOptions.new
       request = HTTP::Request.new("GET", "/")
@@ -322,9 +452,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("X-Download-Options").should be_true
       client_response.headers["X-Download-Options"].should eq "noopen"
     end
+
+    it "will not set the X-Download-Options header if x_download_options == false" do
+      Kemal::Shield.config.x_download_options = false
+
+      add_handler Kemal::Shield::XDownloadOptions.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("X-Download-Options").should be_false
+    end
   end
 
   describe "::XFrameOptions" do
+    after_each do
+      Kemal::Shield.config.x_frame_options_on = true
+    end
+
     it "is set to SAMEORIGIN" do
       add_handler Kemal::Shield::XFrameOptions.new
       request = HTTP::Request.new("GET", "/")
@@ -333,9 +477,23 @@ describe "Kemal::Shield" do
       client_response.headers.has_key?("X-Frame-Options").should be_true
       client_response.headers["X-Frame-Options"].should eq "SAMEORIGIN"
     end
+
+    it "will not set the X-Frame-Options header if x_frame_options_on == false" do
+      Kemal::Shield.config.x_frame_options_on = false
+
+      add_handler Kemal::Shield::XFrameOptions.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("X-Frame-Options").should be_false
+    end
   end
 
   describe "::XPermittedCrossDomainPolicies" do
+    after_each do
+      Kemal::Shield.config.x_permitted_cross_domain_policies_on = true
+    end
+
     it "is set to none" do
       add_handler Kemal::Shield::XPermittedCrossDomainPolicies.new
       request = HTTP::Request.new("GET", "/")
@@ -343,6 +501,16 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("X-Permitted-Cross-Domain-Policies").should be_true
       client_response.headers["X-Permitted-Cross-Domain-Policies"].should eq "none"
+    end
+
+    it "will not set the X-Permitted-Cross-Domain-Policies header if x_permitted_cross_domain_policies_on == false" do
+      Kemal::Shield.config.x_permitted_cross_domain_policies_on = false
+
+      add_handler Kemal::Shield::XPermittedCrossDomainPolicies.new
+      request = HTTP::Request.new("GET", "/")
+
+      client_response = call_request_on_app(request)
+      client_response.headers.has_key?("X-Permitted-Cross-Domain-Policies").should be_false
     end
   end
 

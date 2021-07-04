@@ -22,7 +22,9 @@ require "kemal"
 # ```
 class Kemal::Shield::ReferrerPolicy < Kemal::Handler
   def call(context)
-    context.response.headers["Referrer-Policy"] = Kemal::Shield.config.referrer_policy
+    if Kemal::Shield.config.referrer_on
+      context.response.headers["Referrer-Policy"] = Kemal::Shield.config.referrer_policy
+    end
     call_next(context)
   end
 end

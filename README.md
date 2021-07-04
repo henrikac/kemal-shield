@@ -74,7 +74,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | expect_ct_report_uri | The URI where the user agent should report Expect-CT failures | `""` |
 | hide_powered_by | Whether to remove the X-Powered-By header | `true` |
 | no_sniff | Set X-Content-Type-Options header  | `true` |
-| aoc | Set Origin-Agent-Cluster header | `true` |
+| oac | Set Origin-Agent-Cluster header | `true` |
 | referrer_on | Set Referrer-Policy header | `true` |
 | referrer_policy | The Referrer-Policy policy | `no-referrer` |
 | sts_on | Set Strict-Transport-Security | `true` |

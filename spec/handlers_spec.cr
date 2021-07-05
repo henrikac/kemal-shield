@@ -10,9 +10,6 @@ describe "Kemal::Shield" do
   describe "::ContentSecurityPolicy" do
     after_each do
       Kemal::Shield.config.csp_on = true
-      Kemal::Shield.config.csp_defaults = true
-      Kemal::Shield.config.csp_directives = Kemal::Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
-      Kemal::Shield.config.csp_report_only = false
     end
 
     it "has default policy" do
@@ -30,9 +27,7 @@ describe "Kemal::Shield" do
     end
 
     it "adds default directives if not in custom directives and use_defaults is true" do
-      Kemal::Shield.config.csp_directives = {"default-src" => ["'self'"]}
-
-      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      add_handler Kemal::Shield::ContentSecurityPolicy.new(directives: {"default-src" => ["'self'"]})
       request = HTTP::Request.new("GET", "/")
 
       expected_policy = "default-src 'self';base-uri 'self';block-all-mixed-content;\
@@ -46,10 +41,10 @@ describe "Kemal::Shield" do
     end
 
     it "does not add default directives if use_defaults is false" do
-      Kemal::Shield.config.csp_defaults = false
-      Kemal::Shield.config.csp_directives = {"default-src" => ["'self'"]}
-
-      add_handler Kemal::Shield::ContentSecurityPolicy.new
+      add_handler Kemal::Shield::ContentSecurityPolicy.new(
+        use_defaults: false,
+        directives: {"default-src" => ["'self'"]}
+      )
       request = HTTP::Request.new("GET", "/")
 
       expected_policy = "default-src 'self';"
@@ -70,9 +65,7 @@ describe "Kemal::Shield" do
     end
 
     it "raises an ArgumentError if directive name is an empty string" do
-      Kemal::Shield.config.csp_directives = {"" => ["'self'"]}
-
-      handler = Kemal::Shield::ContentSecurityPolicy.new
+      handler = Kemal::Shield::ContentSecurityPolicy.new(directives: {"" => ["'self'"]})
       request = HTTP::Request.new("GET", "/")
 
       expect_raises(ArgumentError) do
@@ -81,9 +74,7 @@ describe "Kemal::Shield" do
     end
 
     it "raises an ArgumentError if directive name matches /[^a-zA-Z0-9-]/" do
-      Kemal::Shield.config.csp_directives = {"default_src" => ["'self'"]}
-
-      handler = Kemal::Shield::ContentSecurityPolicy.new
+      handler = Kemal::Shield::ContentSecurityPolicy.new(directives: {"default_src" => ["'self'"]})
       request = HTTP::Request.new("GET", "/")
 
       expect_raises(ArgumentError) do
@@ -92,12 +83,10 @@ describe "Kemal::Shield" do
     end
 
     it "raises an ArgumentError if dublicate directives" do
-      Kemal::Shield.config.csp_directives = {
+      handler = Kemal::Shield::ContentSecurityPolicy.new(directives: {
         "default-src" => ["'self'"],
         "DEFAULT-SRC" => ["'self'"]
-      }
-
-      handler = Kemal::Shield::ContentSecurityPolicy.new
+      })
       request = HTTP::Request.new("GET", "/")
 
 
@@ -107,9 +96,7 @@ describe "Kemal::Shield" do
     end
 
     it "raises an ArgumentError if default-src has no value" do
-      Kemal::Shield.config.csp_directives = {"default-src" => [] of String}
-
-      handler = Kemal::Shield::ContentSecurityPolicy.new
+      handler = Kemal::Shield::ContentSecurityPolicy.new(directives: {"default-src" => [] of String})
       request = HTTP::Request.new("GET", "/")
 
       expect_raises(ArgumentError) do
@@ -124,9 +111,7 @@ describe "Kemal::Shield" do
       ]
 
       test_directives.each do |test_directive|
-        Kemal::Shield.config.csp_directives = test_directive
-
-        handler = Kemal::Shield::ContentSecurityPolicy.new
+        handler = Kemal::Shield::ContentSecurityPolicy.new(directives: test_directive)
         request = HTTP::Request.new("GET", "/")
 
         expect_raises(ArgumentError) do
@@ -184,6 +169,12 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Cross-Origin-Opener-Policy").should be_false
     end
+
+    it "raises an ArgumentError if invalid policy" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::CrossOriginOpenerPolicy.new("invalid-policy")
+      end
+    end
   end
 
   describe "::CrossOriginResourcePolicy" do
@@ -209,14 +200,17 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Cross-Origin-Resource-Policy").should be_false
     end
+
+    it "raises an ArgumentError if invalid policy" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::CrossOriginResourcePolicy.new("invalid-policy")
+      end
+    end
   end
 
   describe "::ExpectCT" do
     after_each do
       Kemal::Shield.config.expect_ct = true
-      Kemal::Shield.config.expect_ct_max_age = 0
-      Kemal::Shield.config.expect_ct_enforce = false
-      Kemal::Shield.config.expect_ct_report_uri = ""
     end
 
     it "has max-age=0 by default" do
@@ -229,9 +223,7 @@ describe "Kemal::Shield" do
     end
 
     it "can turn on enforce" do
-      Kemal::Shield.config.expect_ct_enforce = true
-
-      add_handler Kemal::Shield::ExpectCT.new
+      add_handler Kemal::Shield::ExpectCT.new(enforce: true)
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -240,9 +232,7 @@ describe "Kemal::Shield" do
     end
 
     it "can add report_uri" do
-      Kemal::Shield.config.expect_ct_report_uri = "https://example.com/report"
-
-      add_handler Kemal::Shield::ExpectCT.new
+      add_handler Kemal::Shield::ExpectCT.new(report_uri: "https://example.com/report")
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -262,8 +252,7 @@ describe "Kemal::Shield" do
 
     it "raises an ArgumentError if max_age if less than 0" do
       expect_raises(ArgumentError) do
-        Kemal::Shield.config.expect_ct_max_age = -1
-        Kemal::Shield::ExpectCT.new
+        Kemal::Shield::ExpectCT.new(max_age: -1)
       end
     end
   end
@@ -307,6 +296,26 @@ describe "Kemal::Shield" do
       client_response.headers["Referrer-Policy"].should eq "no-referrer"
     end
 
+    it "should set custom policy correctly" do
+      tests = [
+        {tokens: ["origin", "strict-origin", "same-origin"], expected: "origin,strict-origin,same-origin"},
+        {tokens: ["no-referrer"], expected: "no-referrer"},
+        {tokens: ["no-referrer", "no-referrer-when-downgrade"], expected: "no-referrer,no-referrer-when-downgrade"}
+      ]
+
+      tests.each do |test|
+        Kemal.config.clear
+        Kemal::RouteHandler::INSTANCE.routes = Radix::Tree(Kemal::Route).new
+
+        add_handler Kemal::Shield::ReferrerPolicy.new(test[:tokens])
+        request = HTTP::Request.new("GET", "/")
+
+        client_response = call_request_on_app(request)
+        client_response.headers.has_key?("Referrer-Policy").should be_true
+        client_response.headers["Referrer-Policy"].should eq test[:expected]
+      end
+    end
+
     it "will not set the Referrer-Policy header if referrer_on == false" do
       Kemal::Shield.config.referrer_on = false
 
@@ -316,14 +325,29 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("Referrer-Policy").should be_false
     end
+
+    it "raises an ArgumentError if tokens are empty" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::ReferrerPolicy.new([] of String)
+      end
+    end
+
+    it "raises an ArgumentError if tokens contains invalid tokens" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::ReferrerPolicy.new(["invalid-token"])
+      end
+    end
+
+    it "raises an ArgumentError if tokens contains dublicates" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::ReferrerPolicy.new(["no-referrer", "no-referrer"])
+      end
+    end
   end
   
   describe "::StrictTransportSecurity" do
     after_each do
       Kemal::Shield.config.sts_on = true
-      Kemal::Shield.config.sts_max_age = Kemal::Shield::StrictTransportSecurity::DEFAULT_MAX_AGE
-      Kemal::Shield.config.sts_include_sub = true
-      Kemal::Shield.config.sts_preload = false
     end
 
     it "has max-age and includeSubDomains set by default" do
@@ -336,9 +360,7 @@ describe "Kemal::Shield" do
     end
 
     it "can turn off includeSubDomains" do
-      Kemal::Shield.config.sts_include_sub = false
-
-      add_handler Kemal::Shield::StrictTransportSecurity.new
+      add_handler Kemal::Shield::StrictTransportSecurity.new(include_sub_domains: false)
       request = HTTP::Request.new("GET", "/")
 
       client_response = call_request_on_app(request)
@@ -347,9 +369,7 @@ describe "Kemal::Shield" do
     end
 
     it "can turn on preload" do
-      Kemal::Shield.config.sts_preload = true
-
-      add_handler Kemal::Shield::StrictTransportSecurity.new
+      add_handler Kemal::Shield::StrictTransportSecurity.new(preload: true)
       request = HTTP::Request.new("GET", "/")
 
       expected = "max-age=15552000; includeSubDomains; preload"
@@ -371,9 +391,7 @@ describe "Kemal::Shield" do
 
     it "raises an ArgumentError if max_age is less than 0" do
       expect_raises(ArgumentError) do
-        Kemal::Shield.config.sts_max_age = -1
-
-        Kemal::Shield::StrictTransportSecurity.new
+        Kemal::Shield::StrictTransportSecurity.new(max_age: -1)
       end
     end
   end
@@ -478,6 +496,26 @@ describe "Kemal::Shield" do
       client_response.headers["X-Frame-Options"].should eq "SAMEORIGIN"
     end
 
+    it "should set option correctly" do
+      tests = [
+        {input: "SAME-ORIGIN", expected: "SAMEORIGIN"},
+        {input: "DENY", expected: "DENY"},
+        {input: "saMe-ORIgiN", expected: "SAMEORIGIN"}
+      ]
+
+      tests.each do |test|
+        Kemal.config.clear
+        Kemal::RouteHandler::INSTANCE.routes = Radix::Tree(Kemal::Route).new
+
+        add_handler Kemal::Shield::XFrameOptions.new(test[:input])
+        request = HTTP::Request.new("GET", "/")
+
+        client_response = call_request_on_app(request)
+        client_response.headers.has_key?("X-Frame-Options").should be_true
+        client_response.headers["X-Frame-Options"].should eq test[:expected]
+      end
+    end
+
     it "will not set the X-Frame-Options header if x_frame_options_on == false" do
       Kemal::Shield.config.x_frame_options_on = false
 
@@ -487,6 +525,18 @@ describe "Kemal::Shield" do
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("X-Frame-Options").should be_false
     end
+
+    it "should raise an ArgumentError if invalid option" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::XFrameOptions.new("INVALID")
+      end
+    end
+
+    it "should raise an ArgumentError if option is set to ALLOW-FROM" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::XFrameOptions.new("ALLOW-FROM")
+      end
+    end
   end
 
   describe "::XPermittedCrossDomainPolicies" do
@@ -494,13 +544,29 @@ describe "Kemal::Shield" do
       Kemal::Shield.config.x_permitted_cross_domain_policies_on = true
     end
 
-    it "is set to none" do
+    it "is set to none by default" do
       add_handler Kemal::Shield::XPermittedCrossDomainPolicies.new
       request = HTTP::Request.new("GET", "/")
       
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("X-Permitted-Cross-Domain-Policies").should be_true
       client_response.headers["X-Permitted-Cross-Domain-Policies"].should eq "none"
+    end
+
+    it "should set policy correctly" do
+      policies = ["none", "master-only", "by-content-type", "all"]
+
+      policies.each do |policy|
+        Kemal.config.clear
+        Kemal::RouteHandler::INSTANCE.routes = Radix::Tree(Kemal::Route).new
+        
+        add_handler Kemal::Shield::XPermittedCrossDomainPolicies.new(policy)
+        request = HTTP::Request.new("GET", "/")
+
+        client_response = call_request_on_app(request)
+        client_response.headers.has_key?("X-Permitted-Cross-Domain-Policies").should be_true
+        client_response.headers["X-Permitted-Cross-Domain-Policies"].should eq policy
+      end
     end
 
     it "will not set the X-Permitted-Cross-Domain-Policies header if x_permitted_cross_domain_policies_on == false" do
@@ -511,6 +577,12 @@ describe "Kemal::Shield" do
 
       client_response = call_request_on_app(request)
       client_response.headers.has_key?("X-Permitted-Cross-Domain-Policies").should be_false
+    end
+
+    it "should raise an ArgumentError if invalid policy" do
+      expect_raises(ArgumentError) do
+        Kemal::Shield::XPermittedCrossDomainPolicies.new("invalid")
+      end
     end
   end
 

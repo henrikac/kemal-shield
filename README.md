@@ -23,7 +23,7 @@ This shard is inspired by [Helmet](https://github.com/helmetjs/helmet).
 require "kemal"
 require "kemal-shield"
 
-Kemal::Shield::All.new # => adds handlers with their default settings
+Kemal::Shield.activate # => adds handlers with their default settings
 
 get "/" do
   "Home"
@@ -36,6 +36,7 @@ The handlers can also be added individually as you would add any other handler
 
 ```crystal
 add_handler Kemal::Shield::XPoweredBy.new
+add_handler Kemal::Shield::XFrameOptions.new("DENY")
 ```
 
 #### Configure handlers
@@ -46,7 +47,7 @@ Kemal::Shield.config do |config|
   config.csp_on = true
   config.hide_powered_by = true
   config.no_sniff = true
-  config.referrer_policy = "no-referrer"
+  config.referrer_policy = ["no-referrer"]
   config.x_xss_protection = false
 end
 ```
@@ -55,7 +56,15 @@ or
 Kemal::Shield.config.hide_powered_by = true
 ```
 
-It is recommended to configure the headers before calling `Kemal::Shield::All.new`. This is to make sure that the handlers will use the custom configurations.
+It is recommended to configure the headers before calling `Kemal::Shield.activate`. This is to make sure that the handlers will use the custom configurations.
+
+```crystal
+Kemal::Shield.config.corp = "cross-origin" # => Good: This will be used when calling .activate
+
+Kemal::Shield.activate
+
+Kemal::Shield.config.corp = "same-site" # => Bad: Handlers has already been initialized
+```
 
 | Option | Description | Default |
 |---|---|---|
@@ -76,7 +85,7 @@ It is recommended to configure the headers before calling `Kemal::Shield::All.ne
 | no_sniff | Set X-Content-Type-Options header  | `true` |
 | oac | Set Origin-Agent-Cluster header | `true` |
 | referrer_on | Set Referrer-Policy header | `true` |
-| referrer_policy | The Referrer-Policy policy | `"no-referrer"` |
+| referrer_policy | The Referrer-Policy policy | `["no-referrer"]` |
 | sts_on | Set Strict-Transport-Security | `true` |
 | sts_max_age | Seconds that the browser should remember that a site is only to be accessed using HTTPS | `15_552_000` |
 | sts_include_sub | Add rule to subdomains | `true` |

@@ -8,7 +8,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.hide_powered_by = false
     # ```
-    class XPoweredBy < Kemal::Handler
+    class XPoweredBy < Shield::Handler
       def call(context)
         if Kemal::Shield.config.hide_powered_by
           context.response.headers.delete("X-Powered-By")

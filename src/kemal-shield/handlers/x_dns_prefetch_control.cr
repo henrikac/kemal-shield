@@ -18,7 +18,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.x_dns_control_on = false
     # ```
-    class XDNSPrefetchControl < Kemal::Handler
+    class XDNSPrefetchControl < Shield::Handler
       def call(context)
         if Kemal::Shield.config.x_dns_prefetch_control_on
           value = Kemal::Shield.config.x_dns_prefetch_control ? "on" : "off"

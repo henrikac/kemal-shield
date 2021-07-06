@@ -29,7 +29,7 @@ module Kemal
     # "strict-origin-when-cross-origin"
     # "unsafe-url"
     # ```
-    class ReferrerPolicy < Kemal::Handler
+    class ReferrerPolicy < Shield::Handler
       @policy : String
 
       def initialize(policy_tokens : Array(String) = ["no-referrer"])

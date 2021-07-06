@@ -18,7 +18,7 @@ module Kemal
     # "same-site"
     # "cross-origin"
     # ```
-    class CrossOriginResourcePolicy < Kemal::Handler
+    class CrossOriginResourcePolicy < Shield::Handler
       @policy : String
 
       def initialize(@policy = "same-origin")

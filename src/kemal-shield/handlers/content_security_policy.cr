@@ -28,7 +28,7 @@ module Kemal
     # Kemal::Shield.config.csp_directives = Shield::ContentSecurityPolicy::DEFAULT_DIRECTIVES
     # Kemal::Shield.config.csp_report_only = false
     # ```
-    class ContentSecurityPolicy < Kemal::Handler
+    class ContentSecurityPolicy < Shield::Handler
       # Default Content-Security-Policy directives
       DEFAULT_DIRECTIVES = {
         "default-src" => ["'self'"],

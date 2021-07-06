@@ -15,7 +15,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.sts_on = false
     # ```
-    class StrictTransportSecurity < Kemal::Handler
+    class StrictTransportSecurity < Shield::Handler
       # The default *max_age* (15_552_000 seconds).
       DEFAULT_MAX_AGE = 180 * 24 * 60 * 60
 

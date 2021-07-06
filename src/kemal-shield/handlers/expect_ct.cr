@@ -18,7 +18,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.expect_ct = false
     # ```
-    class ExpectCT < Kemal::Handler
+    class ExpectCT < Shield::Handler
       @max_age : Int32
       @enforce : Bool
       @report_uri : String

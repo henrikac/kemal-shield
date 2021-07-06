@@ -11,7 +11,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.x_download_options = false
     # ```
-    class XDownloadOptions < Kemal::Handler
+    class XDownloadOptions < Shield::Handler
       def call(context)
         if Kemal::Shield.config.x_download_options
           context.response.headers["X-Download-Options"] = "noopen"

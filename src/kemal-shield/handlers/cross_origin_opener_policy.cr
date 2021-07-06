@@ -18,7 +18,7 @@ module Kemal
     # "same-origin-allow-popups"
     # "unsafe-none"
     # ```
-    class CrossOriginOpenerPolicy < Kemal::Handler
+    class CrossOriginOpenerPolicy < Shield::Handler
       # The Cross-Origin-Opener-Policy policy
       @policy : String
 

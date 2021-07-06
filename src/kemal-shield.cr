@@ -29,6 +29,80 @@ module Kemal
   # end
   # ```
   module Shield
+    HANDLERS = [] of Shield::Handler.class
+
+    # Adds a `Kemal::Shield::Handler`.
+    #
+    # ```
+    # class CustomHandler < Kemal::Shield::Handler
+    #   def call(context)
+    #     # code ...
+    #     call_next context
+    #   end
+    # end
+    #
+    # Kemal::Shield.add_handler CustomHandler.new
+    # ```
+    #
+    # A `Kemal::Shield::DublicateHandlerError` is raised if dublicate handlers
+    # are added.
+    #
+    # ```
+    # Kemal::Shield.add_handler CustomHandler.new # => okay
+    # Kemal::Shield.add_handler CustomHandler.new # => raises DublicateHandlerError
+    # ```
+    def self.add_handler(handler : Shield::Handler)
+      if HANDLERS.includes?(handler.class)
+        raise Shield::DublicateHandlerError.new(handler)
+      end
+      HANDLERS << handler.class
+      Kemal.config.add_handler handler
+    end
+
+    # Removes a `Kemal::Shield::Handler`.
+    #
+    # Returns the removed handler if found, otherwise `nil`.
+    #
+    # ```
+    # Kemal::Shield.activate
+    #
+    # Kemal::Shield.remove_handler Kemal::Shield::ExpectCT # => Kemal::Shield::ExpectCT object
+    # Kemal::Shield.remove_handler Kemal::Shield::ExpectCT # => nil
+    # ```
+    def self.remove_handler(handler : Shield::Handler.class)
+      if HANDLERS.includes?(handler)
+        HANDLERS.delete(handler)
+        Kemal.config.handlers.each do |h|
+          if h.class == handler
+            return Kemal.config.handlers.delete(h)
+          end
+        end
+      end
+      return nil
+    end
+
+    # Removes all `Kemal::Shield::Handler`.
+    #
+    # ```
+    # Kemal::Shield.deactivate
+    # ```
+    def self.deactivate
+      non_shield_handlers = [] of HTTP::Handler
+
+      Kemal.config.handlers.each do |handler|
+        if !HANDLERS.includes?(handler.class)
+          non_shield_handlers << handler
+        end
+      end
+      HANDLERS.clear
+      Kemal.config.handlers = non_shield_handlers
+    end
+
+    # Adds a collection of `Kemal::Shield::Handler`.
+    #
+    # ```
+    # Kemal::Shield.activate
+    # ```
     def self.activate
       add_handler ContentSecurityPolicy.new(
         config.csp_defaults,

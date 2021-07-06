@@ -8,7 +8,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.aoc = false
     # ```
-    class OriginAgentCluster < Kemal::Handler
+    class OriginAgentCluster < Shield::Handler
       def call(context)
         if Kemal::Shield.config.oac
           context.response.headers["Origin-Agent-Cluster"] = "?1"

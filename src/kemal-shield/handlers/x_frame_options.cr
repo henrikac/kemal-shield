@@ -19,7 +19,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.x_frame_options_on = false
     # ```
-    class XFrameOptions < Kemal::Handler
+    class XFrameOptions < Shield::Handler
       @option : String
 
       def initialize(opt = "SAMEORIGIN")

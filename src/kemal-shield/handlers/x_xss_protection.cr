@@ -12,7 +12,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.x_xss_protection = true
     # ```
-    class XXSSProtection < Kemal::Handler
+    class XXSSProtection < Shield::Handler
       def call(context)
         if !Kemal::Shield.config.x_xss_protection
           context.response.headers["X-XSS-Protection"] = "0"

@@ -28,7 +28,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.x_permitted_cross_domain_policies_on = false
     # ```
-    class XPermittedCrossDomainPolicies < Kemal::Handler
+    class XPermittedCrossDomainPolicies < Shield::Handler
       def initialize(@policy = "none")
         if !valid_policy?(@policy)
           raise ArgumentError.new("X-Permitted-Cross-Domain-Policies does not support \"#{@policy}\"")

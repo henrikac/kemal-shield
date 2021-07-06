@@ -9,7 +9,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.coep_on = false
     # ```
-    class CrossOriginEmbedderPolicy < Kemal::Handler
+    class CrossOriginEmbedderPolicy < Shield::Handler
       def call(context)
         if Kemal::Shield.config.coep_on
           context.response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"

@@ -9,7 +9,7 @@ module Kemal
     # ```
     # Kemal::Shield.config.no_sniff = false
     # ```
-    class XContentTypeOptions < Kemal::Handler
+    class XContentTypeOptions < Shield::Handler
       def call(context)
         if Kemal::Shield.config.no_sniff
           context.response.headers["X-Content-Type-Options"] = "nosniff"

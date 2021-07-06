@@ -49,7 +49,7 @@ A `Kemal::Shield::DublicateHandlerError` is raised if a dublicate handler is add
 ##### Remove handlers
 There are two ways of removing a `Kemal::Shield::Handler`.  
 
-1. `Kemal::Shield.remove_handler´ if you just need to remove a single handler
+1. `Kemal::Shield.remove_handler` if you just need to remove a single handler
 2. `Kemal::Shield.deactivate` if you want to remove all `Kemal::Shield::Handler`.
 
 ```crystal

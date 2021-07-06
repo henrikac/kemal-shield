@@ -33,7 +33,7 @@ Kemal.run
 ```
 
 #### Managing handlers
-###### Add handlers
+##### Add handlers
 The handlers can also be added individually as you would add any other handler.
 The recommended way of adding handlers is to use `Kemal::Shield.add_handler` instead of Kemal's built-in `add_handler`.
 The reason for using `Kemal::Shield.add_handler` over Kemal's built-in `add_handler` is that `Kemal::Shield.add_handler` keeps track of all `Kemal::Shield::Handler`.
@@ -46,7 +46,7 @@ Kemal::Shield.add_handler Kemal::Shield::XFrameOptions.new("DENY")
 
 A `Kemal::Shield::DublicateHandlerError` is raised if a dublicate handler is added.
 
-###### Remove handlers
+##### Remove handlers
 There are two ways of removing a `Kemal::Shield::Handler`.  
 
 1. `Kemal::Shield.remove_handler´ if you just need to remove a single handler

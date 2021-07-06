@@ -32,14 +32,46 @@ end
 Kemal.run
 ```
 
-The handlers can also be added individually as you would add any other handler
+#### Managing handlers
+###### Add handlers
+The handlers can also be added individually as you would add any other handler.
+The recommended way of adding handlers is to use `Kemal::Shield.add_handler` instead of Kemal's built-in `add_handler`.
+The reason for using `Kemal::Shield.add_handler` over Kemal's built-in `add_handler` is that `Kemal::Shield.add_handler` keeps track of all `Kemal::Shield::Handler`.
+It also makes sure that no dublicate `Kemal::Shield::Handler` is being added.
 
 ```crystal
-add_handler Kemal::Shield::XPoweredBy.new
-add_handler Kemal::Shield::XFrameOptions.new("DENY")
+Kemal::Shield.add_handler Kemal::Shield::XPoweredBy.new
+Kemal::Shield.add_handler Kemal::Shield::XFrameOptions.new("DENY")
 ```
 
-#### Configure handlers
+A `Kemal::Shield::DublicateHandlerError` is raised if a dublicate handler is added.
+
+###### Remove handlers
+There are two ways of removing a `Kemal::Shield::Handler`.  
+
+1. `Kemal::Shield.remove_handler´ if you just need to remove a single handler
+2. `Kemal::Shield.deactivate` if you want to remove all `Kemal::Shield::Handler`.
+
+```crystal
+Kemal::Shield.remove_handler Kemal::Shield::ExpectCT
+```
+
+#### Custom handler
+Creating a new handler works just as creating a regular Kemal handler.
+The only difference is that the new handlers should inherit from `Kemal::Shield::Handler` instead of `Kemal::Handler`.
+
+```crystal
+class CustomHandler < Kemal::Shield::Handler
+  def call(context)
+    # code ...
+    call_next context
+  end
+end
+```
+
+This makes it possible to add handlers using `Kemal::Shield.add_handler` and/or remove handlers using `Kemal::Shield.remove_handler` or `Kemal::Shield.deactivate`.
+
+#### Configuration
 The different headers can be configured in the same way as Kemal:
 
 ```crystal
@@ -56,7 +88,8 @@ or
 Kemal::Shield.config.hide_powered_by = true
 ```
 
-It is recommended to configure the headers before calling `Kemal::Shield.activate`. This is to make sure that the handlers will use the custom configurations.
+Configuration should be done before calling `Kemal::Shield.activate`.
+This is to make sure that the handlers will use the custom configurations.
 
 ```crystal
 Kemal::Shield.config.corp = "cross-origin" # => Good: This will be used when calling .activate
